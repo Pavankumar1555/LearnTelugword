@@ -33,7 +33,7 @@ export const LEVELS_DATA: Record<string, WordData[]> = {
     { id: '1-22', word: 'బలపం', letters: ['బ', 'ల', 'ప', 'ం'], englishMeaning: 'Slate Pencil' },
     { id: '1-23', word: 'మామ', letters: ['మా', 'మ'], englishMeaning: ' uncle' },
     { id: '1-24', word: 'యమ', letters: ['య', 'మ'], englishMeaning: 'Yama' },
-    { id: '1-25', word: 'రమ', letters: ['ర', 'మ'], englishMeaning: 'Rama' },
+    { id: '1-25', word: 'రామ', letters: ['రా', 'మ'], englishMeaning: 'Rama' },
     { id: '1-26', word: 'వల', letters: ['వ', 'ల'], englishMeaning: 'Net' },
     { id: '1-27', word: 'శనగ', letters: ['శ', 'న', 'గ'], englishMeaning: 'chickpea' },
     { id: '1-28', word: 'ఆరు', letters: ['ఆ', 'రు'], englishMeaning: 'Six' },
