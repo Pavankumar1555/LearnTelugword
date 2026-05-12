@@ -205,12 +205,12 @@ export default function Letters() {
       // Letters/combinations that need special pronunciation handling
       const pronunciationMap: { [key: string]: string } = {
         "ఒ": "o",
-        "అం": "am",
+        "అం": "aum",
         "అః": "ah",
         "ఢ": "dha",
         "ఱ": "rra",
         "ౠ": "ruu",
-        "ఔ": "au"
+        "ఔ": "auv"
       };
 
       // For combinations with consonant + vowel mark
