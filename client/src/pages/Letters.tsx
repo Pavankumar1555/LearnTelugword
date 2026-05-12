@@ -208,7 +208,8 @@ export default function Letters() {
         "ఒ": "o",
         "అం": "aum",
         "అః": "aha",
-        "ఢ": "dda",
+        "ఢ": "ɖʱ",
+        "శ" : "she",
         "ఱ": "ra"
           };
 
