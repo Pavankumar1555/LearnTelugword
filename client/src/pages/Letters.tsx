@@ -40,7 +40,7 @@ const TELUGU_ALPHABET = {
     { char: "ట", name: "ta" },
     { char: "ఠ", name: "tha" },
     { char: "డ", name: "da" },
-    { char: "ఢ", name: "dah" },
+    { char: "ఢ", name: "dda" },
     { char: "ణ", name: "na" },
     { char: "త", name: "tha" },
     { char: "థ", name: "tha" },
@@ -204,13 +204,13 @@ export default function Letters() {
 
       // Letters/combinations that need special pronunciation handling
       const pronunciationMap: { [key: string]: string } = {
+        "ౠ": "ruu",
         "ఒ": "o",
         "అం": "aum",
         "అః": "aha",
-        "ఢ": "dha",
-        "ఱ": "rra",
-        "ౠ": "ruu"
-      };
+        "ఢ": "dda",
+        "ఱ": "ra"
+          };
 
       // For combinations with consonant + vowel mark
       // If it's just a consonant or simple combo, speak it directly
