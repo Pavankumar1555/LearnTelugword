@@ -209,8 +209,7 @@ export default function Letters() {
         "అః": "aha",
         "ఢ": "dha",
         "ఱ": "rra",
-        "ౠ": "ruu",
-        "ఔ": "au"
+        "ౠ": "ruu"
       };
 
       // For combinations with consonant + vowel mark
