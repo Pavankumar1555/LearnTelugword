@@ -175,6 +175,11 @@ export default function Letters() {
   const [displayedResult, setDisplayedResult] = useState<string>("");
   const [clickedHalluIndex, setClickedHalluIndex] = useState<number | null>(null);
 
+  // show first 25 consonants in a 5x5 grid, rest rendered below normally
+  const FIRST_CONSONANT_COUNT = 25;
+  const firstConsonants = TELUGU_ALPHABET.consonants.slice(0, FIRST_CONSONANT_COUNT);
+  const restConsonants = TELUGU_ALPHABET.consonants.slice(FIRST_CONSONANT_COUNT);
+
   // Initialize on mount to fix reload issues
   useEffect(() => {
     try {
@@ -1083,20 +1088,48 @@ export default function Letters() {
               <Sparkles className="text-sky-500" />
               Consonants (హల్లులు)
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
-              {(TELUGU_ALPHABET?.consonants || []).map((l) => (
-                <motion.div
-                  key={l.char}
-                  whileHover={{ y: -5 }}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
-                  onClick={() => speak(l.char, l.name)}
-                >
-                  <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
-                  <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
-                  <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </motion.div>
-              ))}
+
+            {/* First 25 consonants: fixed 5x5 grid (keeps 5 columns; horizontally scrolls on very small screens) */}
+            <div className="mb-6">
+              <div className="overflow-auto -mx-2 px-2">
+                <div className="grid grid-cols-5 gap-5 w-max min-w-full">
+                  {firstConsonants.map((l) => (
+                    <motion.div
+                      key={l.char}
+                      whileHover={{ y: -5 }}
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
+                      onClick={() => speak(l.char, l.name)}
+                    >
+                      <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                      <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
+                      <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+              <div className="text-sm text-slate-500 mt-3 italic text-center">First 25 consonants (5 × 5)</div>
             </div>
+
+            {/* Remaining consonants shown normally */}
+            {restConsonants.length > 0 && (
+              <div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
+                  {restConsonants.map((l) => (
+                    <motion.div
+                      key={l.char}
+                      whileHover={{ y: -5 }}
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
+                      onClick={() => speak(l.char, l.name)}
+                    >
+                      <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                      <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
+                      <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="text-sm text-slate-500 mt-3 italic text-center">Remaining consonants</div>
+              </div>
+            )}
           </div>
         </div>
       )}
