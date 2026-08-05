@@ -540,7 +540,7 @@ export default function Letters() {
   }
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-b from-sky-50 to-white text-slate-900 selection:bg-sky-100">
+    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-b from-sky-50 to-white text-slate-900 selection:bg-sky-100"> 
       <header className="mb-8 flex flex-wrap justify-center gap-2 bg-white p-2 rounded-3xl shadow-md border border-sky-50 relative z-50">
         <Button 
           variant={mode === 'learn' ? 'default' : 'ghost'} 
