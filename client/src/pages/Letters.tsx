@@ -7,6 +7,12 @@ import confetti from "canvas-confetti";
 
 /* ---------------- TELUGU LETTER DATA ---------------- */
 
+type TeluguItem = {
+  char: string;
+  name: string;
+  parent?: string;
+};
+
 const TELUGU_ALPHABET = {
   vowels: [
     { char: "అ", name: "a" },
@@ -124,8 +130,16 @@ const TELUGU_ALPHABET = {
   ]
 };
 
-const ALL_LETTERS = [...TELUGU_ALPHABET.vowels, ...TELUGU_ALPHABET.consonants];
-const ALL_VATHULU = [...TELUGU_ALPHABET.achuVathulu, ...TELUGU_ALPHABET.halluVathulu];
+const ALL_LETTERS: TeluguItem[] = [
+  ...TELUGU_ALPHABET.vowels,
+  ...TELUGU_ALPHABET.consonants,
+];
+
+const ALL_VATHULU: TeluguItem[] = [
+  ...TELUGU_ALPHABET.achuVathulu,
+  ...TELUGU_ALPHABET.halluVathulu,
+];
+
 const ALL_GUNITHALU = TELUGU_ALPHABET.gunithalu;
 
 /* ------------- MAIN COMPONENT ------------- */
