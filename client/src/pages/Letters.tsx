@@ -6,14 +6,19 @@ import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
 
 /* ---------------- TELUGU LETTER DATA ---------------- */
-
 type TeluguItem = {
   char: string;
   name: string;
   parent?: string;
 };
 
-const TELUGU_ALPHABET = {
+const TELUGU_ALPHABET: {
+  vowels: TeluguItem[];
+  consonants: TeluguItem[];
+  achuVathulu: TeluguItem[];
+  halluVathulu: TeluguItem[];
+  gunithalu: TeluguItem[];
+} = {
   vowels: [
     { char: "అ", name: "a" },
     { char: "ఆ", name: "aa" },
@@ -130,16 +135,8 @@ const TELUGU_ALPHABET = {
   ]
 };
 
-const ALL_LETTERS: TeluguItem[] = [
-  ...TELUGU_ALPHABET.vowels,
-  ...TELUGU_ALPHABET.consonants,
-];
-
-const ALL_VATHULU: TeluguItem[] = [
-  ...TELUGU_ALPHABET.achuVathulu,
-  ...TELUGU_ALPHABET.halluVathulu,
-];
-
+const ALL_LETTERS = [...TELUGU_ALPHABET.vowels, ...TELUGU_ALPHABET.consonants];
+const ALL_VATHULU = [...TELUGU_ALPHABET.achuVathulu, ...TELUGU_ALPHABET.halluVathulu];
 const ALL_GUNITHALU = TELUGU_ALPHABET.gunithalu;
 
 /* ------------- MAIN COMPONENT ------------- */
@@ -554,7 +551,7 @@ export default function Letters() {
   }
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-b from-sky-50 to-white text-slate-900 selection:bg-sky-100"> 
+    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-b from-sky-50 to-white text-slate-900 selection:bg-sky-100">
       <header className="mb-8 flex flex-wrap justify-center gap-2 bg-white p-2 rounded-3xl shadow-md border border-sky-50 relative z-50">
         <Button 
           variant={mode === 'learn' ? 'default' : 'ghost'} 
@@ -563,5 +560,599 @@ export default function Letters() {
         >
           Letters
         </Button>
+        <Button 
+          variant={mode === 'vathulu' ? 'default' : 'ghost'} 
+          className="rounded-full px-5 text-sm transition-all"
+          onClick={() => setMode('vathulu')}
+        >
+          Vathulu
+        </Button>
+        <Button 
+          variant={mode === 'game' ? 'default' : 'ghost'} 
+          className="rounded-full px-5 text-sm transition-all"
+          onClick={() => setMode('game')}
+        >
+          Letter Game
+        </Button>
+        <Button 
+          variant={mode === 'vathulu-game' ? 'default' : 'ghost'} 
+          className="rounded-full px-5 text-sm transition-all"
+          onClick={() => setMode('vathulu-game')}
+        >
+          Vathu Game
+        </Button>
+        <Button 
+          variant={mode === 'gunithalu' ? 'default' : 'ghost'} 
+          className="rounded-full px-5 text-sm transition-all"
+          onClick={() => setMode('gunithalu')}
+        >
+          Gunithalu
+        </Button>
+        <Button 
+          variant={mode === 'write' ? 'default' : 'ghost'} 
+          className="rounded-full px-5 text-sm transition-all"
+          onClick={() => setMode('write')}
+        >
+          Write Letter
+        </Button>
+      </header>
 
-... (rest of file unchanged) ...
+      {mode === "gunithalu" && (
+        <div className="w-full max-w-5xl">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-6 text-sky-900 border-b-2 border-sky-100 pb-3 flex items-center gap-3">
+              <Sparkles className="text-sky-500" />
+              Gunithalu (హల్లు-అచ్చు)
+            </h2>
+
+            {!isPracticeMode && !isInteractivePractice ? (
+              <div className="space-y-6">
+                {/* Hallu Buttons */}
+                <div className="flex flex-wrap gap-2 justify-center bg-sky-50 p-4 rounded-2xl">
+                  {TELUGU_ALPHABET.consonants.map((c) => (
+                    <button
+                      key={c.char}
+                      onClick={() => setCurrentHallu(c.char)}
+                      className={`px-4 py-2 rounded-lg font-bold text-lg transition-all ${
+                        currentHallu === c.char
+                          ? 'bg-white border-2 border-sky-600 text-sky-700'
+                          : 'bg-sky-100 text-sky-600 hover:bg-sky-200'
+                      }`}
+                    >
+                      {c.char}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Hallu + Achhulu Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {TELUGU_ALPHABET.achuVathulu.map((a, idx) => (
+                    <motion.button
+                      key={idx}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => speak(currentHallu + a.char, a.name)}
+                      className="bg-white border-2 border-sky-200 rounded-xl p-4 hover:border-sky-400 hover:shadow-lg transition-all text-center"
+                    >
+                      <div className="text-5xl font-bold text-sky-700">{currentHallu + a.char}</div>
+                      <div className="text-xs text-slate-500 mt-2">{currentHallu} + {a.name}</div>
+                    </motion.button>
+                  ))}
+                  
+                  {/* Practice Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setIsPracticeMode(true);
+                      setPracticeScore(0);
+                      generatePracticeQuestion();
+                    }}
+                    className="bg-orange-100 border-2 border-orange-400 rounded-xl p-4 hover:border-orange-500 hover:shadow-lg transition-all font-bold text-orange-700 col-span-2 sm:col-span-3 md:col-span-4"
+                  >
+                    🎮 Practice (ప్రాక్టీస్)
+                  </motion.button>
+
+                  {/* Interactive Practice Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setIsInteractivePractice(true);
+                      setSelectedAchhulu(TELUGU_ALPHABET.achuVathulu[1]);
+                      setDisplayedResult("");
+                    }}
+                    className="bg-green-100 border-2 border-green-400 rounded-xl p-4 hover:border-green-500 hover:shadow-lg transition-all font-bold text-green-700 col-span-2 sm:col-span-3 md:col-span-4"
+                  >
+                    🎯 Interactive Practice (ఇంటరాక్టివ్)
+                  </motion.button>
+                </div>
+              </div>
+            ) : isPracticeMode ? (
+              /* Quiz Practice Mode */
+              <div className="space-y-6 text-center">
+                {/* Score */}
+                <div className="bg-sky-50 rounded-2xl p-4 text-2xl font-bold text-sky-700">
+                  Score: {practiceScore}
+                </div>
+
+                {/* Question */}
+                {practiceQuestion && (
+                  <>
+                    <div className="bg-white border-4 border-sky-300 rounded-2xl p-8">
+                      <div className="text-lg text-slate-600 mb-6">
+                        <span className="text-3xl font-bold text-sky-700">{practiceQuestion.hallu}</span>
+                        <span className="text-2xl mx-3">+</span>
+                        <span className="text-3xl font-bold text-sky-700">{practiceQuestion.achhulu.parent}</span>
+                        <span className="text-2xl mx-3">=</span>
+                        <span className="text-3xl font-bold text-sky-700">?</span>
+                      </div>
+                      <div className="text-3xl text-slate-500 font-semibold">
+                        Select the correct answer
+                      </div>
+                    </div>
+
+                    {/* Options */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {practiceOptions.map((opt, idx) => (
+                        <motion.button
+                          key={idx}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => checkPracticeAnswer(opt)}
+                          className="bg-white border-2 border-sky-200 rounded-xl p-4 text-3xl font-bold text-sky-700 hover:border-sky-400 hover:shadow-lg transition-all"
+                        >
+                          {opt}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Exit Practice */}
+                <Button
+                  onClick={() => {
+                    setIsPracticeMode(false);
+                    setPracticeScore(0);
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Back to Grid
+                </Button>
+              </div>
+            ) : (
+              /* Interactive Practice Mode */
+              <div className="space-y-6">
+                {/* Achu Selector Menu */}
+                <div className="bg-sky-50 rounded-2xl p-4">
+                  <div className="text-sm font-semibold text-sky-700 uppercase mb-3">Select Achu (అచ్చు):</div>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {TELUGU_ALPHABET.achuVathulu.map((a, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedAchhulu(a);
+                          setDisplayedResult("");
+                        }}
+                        className={`px-4 py-2 rounded-lg font-bold text-lg transition-all ${
+                          selectedAchhulu.char === a.char
+                            ? 'bg-white border-2 border-sky-600 text-sky-700'
+                            : 'bg-sky-100 text-sky-600 hover:bg-sky-200'
+                        }`}
+                      >
+                        {a.parent}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Hallu Letters Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 relative">
+                  {TELUGU_ALPHABET.consonants.map((c, idx) => (
+                    <div key={c.char} className="relative">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          const result = c.char + selectedAchhulu.char;
+                          setDisplayedResult(result);
+                          setClickedHalluIndex(idx);
+                          speak(c.char, c.name);
+                          setTimeout(() => {
+                            speak("plus", "plus");
+                          }, 600);
+                          setTimeout(() => {
+                            speak(selectedAchhulu.parent, selectedAchhulu.name);
+                          }, 1200);
+                          setTimeout(() => {
+                            speak(result, "result");
+                          }, 1800);
+                        }}
+                        className="bg-white border-2 border-sky-200 rounded-xl p-4 hover:border-sky-400 hover:shadow-lg transition-all w-full"
+                      >
+                        <div className="text-4xl font-bold text-sky-700">{c.char}</div>
+                      </motion.button>
+
+                      {/* Popup Result Near Clicked Button */}
+                      {displayedResult && clickedHalluIndex === idx && (
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0, y: 10 }}
+                          animate={{ scale: 1, opacity: 1, y: -60 }}
+                          exit={{ scale: 0.5, opacity: 0, y: 10 }}
+                          className="absolute left-1/2 -translate-x-1/2 top-0 bg-gradient-to-br from-green-50 to-green-100 border-4 border-green-400 rounded-2xl p-4 shadow-xl whitespace-nowrap z-50 pointer-events-none"
+                        >
+                          <div className="text-3xl font-bold text-green-700">{displayedResult}</div>
+                        </motion.div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Exit Interactive Practice */}
+                <Button
+                  onClick={() => {
+                    setIsInteractivePractice(false);
+                    setDisplayedResult("");
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Back to Grid
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {mode === "vathulu" && (
+        <div className="w-full max-w-5xl">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6 text-sky-900 border-b-2 border-sky-100 pb-3 flex items-center gap-3">
+              <Sparkles className="text-sky-500" />
+              Achu Vathulu (అచ్చు వత్తులు)
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
+              {(TELUGU_ALPHABET?.achuVathulu || []).map((l) => (
+                <motion.div
+                  key={l.char}
+                  whileHover={{ y: -5 }}
+                  className="bg-white p-5 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col items-center justify-center h-20 w-full">
+                    <span className="text-sm text-slate-400 font-medium mb-1 group-hover:text-sky-400 transition-colors">{l.parent} →</span>
+                    <span className="text-4xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                  </div>
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="h-10 w-10 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-100"
+                    onClick={() => speak(l.parent || l.char, l.name)}
+                  >
+                    <Volume2 className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6 text-sky-900 border-b-2 border-sky-100 pb-3 flex items-center gap-3">
+              <Sparkles className="text-sky-500" />
+              Hallu Vathulu (హల్లు వత్తులు)
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
+              {TELUGU_ALPHABET.halluVathulu.map((l) => (
+                <motion.div
+                  key={l.char}
+                  whileHover={{ y: -5 }}
+                  className="bg-white p-5 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col items-center justify-center h-20 w-full">
+                    <span className="text-sm text-slate-400 font-medium mb-1 group-hover:text-sky-400 transition-colors">{l.parent} →</span>
+                    <span className="text-4xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                  </div>
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="h-10 w-10 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-100"
+                    onClick={() => speak(l.parent || l.char, l.name)}
+                  >
+                    <Volume2 className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(mode === "game" || mode === "vathulu-game") && (
+        <div className="w-full max-w-4xl">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 px-4">
+            <div className="bg-white/90 backdrop-blur px-8 py-3 rounded-2xl shadow-sm border border-sky-100 flex items-center gap-4">
+              <span className="text-sky-600 font-bold uppercase tracking-wider text-xs">{mode === 'vathulu-game' ? 'Listen & Find Vathu' : 'Listen & Find Letter'}</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="bg-white/90 backdrop-blur px-8 py-3 rounded-2xl shadow-sm border border-sky-100 flex items-center gap-4">
+                <span className="text-sky-600 font-bold uppercase tracking-wider text-xs">Score</span>
+                <span className="text-3xl font-bold text-slate-800">{score}</span>
+              </div>
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="h-14 w-14 rounded-2xl bg-white border-sky-200 text-sky-600 hover:bg-sky-50 hover:border-sky-300 transition-all shadow-sm"
+                onClick={() => {
+                  if (gameTarget) {
+                    if (mode === 'vathulu-game' && gameTarget.parent) {
+                      speak(gameTarget.parent, gameTarget.name);
+                    } else {
+                      speak(gameTarget.char, gameTarget.name);
+                    }
+                  }
+                }}
+              >
+                <Volume2 className="h-7 w-7" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="relative w-full h-[60vh] bg-sky-50 rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(186,230,253,0.4),transparent)] pointer-events-none" />
+            <AnimatePresence>
+              {bubbles.map((bubble) => (
+                <motion.button
+                  key={bubble.id}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{
+                    scale: 1,
+                    opacity: 1,
+                    left: `${bubble.x}%`,
+                    top: `${bubble.y}%`,
+                  }}
+                  exit={{ scale: 1.5, opacity: 0 }}
+                  onClick={() => handleBubbleClick(bubble)}
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full text-5xl font-bold transition-all shadow-xl flex items-center justify-center border-4 border-white/60 backdrop-blur-md ${
+                    wrongId === bubble.id 
+                      ? "bg-red-500 text-white animate-shake z-10" 
+                      : "bg-white/80 text-sky-900 hover:bg-white hover:scale-110 active:scale-90 z-0"
+                  }`}
+                  style={{
+                    background: `radial-gradient(circle at 30% 30%, white, ${wrongId === bubble.id ? '#ef4444' : '#bae6fd'})`
+                  }}
+                >
+                  {bubble.char}
+                </motion.button>
+              ))}
+            </AnimatePresence>
+          </div>
+          
+          <div className="mt-6 text-center text-slate-400 font-medium italic">
+            Tap the correct {mode === 'vathulu-game' ? 'vathu' : 'letter'} bubble!
+          </div>
+        </div>
+      )}
+
+      {mode === "write" && (
+        <div className="w-full max-w-3xl flex flex-col items-center gap-6">
+          <div className="bg-white/90 backdrop-blur px-8 py-4 rounded-2xl shadow-sm border border-sky-100 flex items-center gap-4">
+            <span className="text-sky-600 font-bold uppercase tracking-wider">Listen & Write</span>
+            <span className="text-5xl font-bold text-slate-800">{writeTarget?.char}</span>
+          </div>
+
+          <div className="w-full max-w-2xl space-y-4">
+            {/* Color and Size Controls */}
+            <div className="flex flex-wrap gap-4 justify-center items-center bg-white/80 p-4 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-sky-700">Color:</span>
+                <div className="flex gap-2">
+                  {['#0ea5e9', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'].map(color => (
+                    <button
+                      key={color}
+                      onClick={() => setBrushColor(color)}
+                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                        brushColor === color ? 'border-slate-800 scale-110' : 'border-slate-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={`Color ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-sky-700">Size:</span>
+                <div className="flex gap-2">
+                  {[2, 4, 6, 8].map(size => (
+                    <button
+                      key={size}
+                      onClick={() => setBrushSize(size)}
+                      className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                        brushSize === size
+                          ? 'bg-sky-600 text-white scale-110'
+                          : 'bg-sky-100 text-sky-700 hover:bg-sky-200'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Canvas with Guide Letter */}
+            <div className="relative w-full" style={{ touchAction: 'none' }}>
+              <div className="relative">
+                {/* Guide letter (faded) */}
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none z-10">
+                  <span className="text-[120px] font-bold text-slate-200 opacity-30">
+                    {writeTarget?.char}
+                  </span>
+                </div>
+                
+                {/* Canvas */}
+                <canvas
+                  ref={setCanvasRef}
+                  width={600}
+                  height={400}
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
+                  onMouseLeave={handleCanvasMouseUp}
+                  onTouchStart={handleCanvasTouchStart}
+                  onTouchMove={handleCanvasTouchMove}
+                  onTouchEnd={handleCanvasTouchEnd}
+                  className="w-full border-4 border-sky-300 rounded-2xl bg-white cursor-crosshair shadow-lg block select-none relative z-20"
+                  style={{ touchAction: 'none', WebkitTouchCallout: 'none' } as any}
+                />
+              </div>
+              
+              <div className="mt-3 text-center text-sm text-slate-500 italic">
+                Trace over the faded letter to match it
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <Button 
+              onClick={checkDrawing}
+              className="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-xl font-bold text-lg"
+            >
+              Check
+            </Button>
+            <Button 
+              onClick={clearCanvas}
+              variant="outline"
+              className="px-8 py-3 rounded-xl font-bold text-lg"
+            >
+              Clear
+            </Button>
+            <Button 
+              size="icon"
+              variant="outline" 
+              className="h-14 w-14 rounded-2xl bg-white border-sky-200 text-sky-600"
+              onClick={() => writeTarget && speak(writeTarget.char, writeTarget.name)}
+            >
+              <Volume2 className="h-6 w-6" />
+            </Button>
+          </div>
+
+          {writeFeedback && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className={`text-center p-6 rounded-2xl text-2xl font-bold ${
+                writeFeedback.type === 'correct'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
+              }`}
+            >
+              {writeFeedback.type === 'correct' ? (
+                <div>
+                  <div>Great Job! 🎉</div>
+                  <Button onClick={nextLetter} className="mt-4 bg-green-600 hover:bg-green-700">
+                    Next Letter
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <div>Let's try again!</div>
+                  <div className="text-4xl mt-3">{writeFeedback.char}</div>
+                  <div className="text-sm mt-2 mb-4">The letter was</div>
+                  <Button onClick={nextLetter} className="bg-red-600 hover:bg-red-700">
+                    Next Letter
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {mode === "learn" && (
+        <div className="w-full max-w-5xl">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6 text-sky-900 border-b-2 border-sky-100 pb-3 flex items-center gap-3">
+              <Sparkles className="text-sky-500" />
+              Vowels (అచ్చులు)
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
+              {(TELUGU_ALPHABET?.vowels || []).map((l) => (
+                <motion.div
+                  key={l.char}
+                  whileHover={{ y: -5 }}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
+                  onClick={() => speak(l.char, l.name)}
+                >
+                  <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                  <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
+                  <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6 text-sky-900 border-b-2 border-sky-100 pb-3 flex items-center gap-3">
+              <Sparkles className="text-sky-500" />
+              Consonants (హల్లులు)
+            </h2>
+
+            {/* First 25 consonants: fixed 5x5 grid (keeps 5 columns; horizontally scrolls on very small screens) */}
+            <div className="mb-6">
+              <div className="overflow-auto -mx-2 px-2">
+                <div className="grid grid-cols-5 gap-5 w-max min-w-full">
+                  {firstConsonants.map((l) => (
+                    <motion.div
+                      key={l.char}
+                      whileHover={{ y: -5 }}
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
+                      onClick={() => speak(l.char, l.name)}
+                    >
+                      <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                      <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
+                      <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+              <div className="text-sm text-slate-500 mt-3 italic text-center">First 25 consonants (5 × 5)</div>
+            </div>
+
+            {/* Remaining consonants shown normally */}
+            {restConsonants.length > 0 && (
+              <div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-5">
+                  {restConsonants.map((l) => (
+                    <motion.div
+                      key={l.char}
+                      whileHover={{ y: -5 }}
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-col items-center gap-3 group transition-shadow hover:shadow-md cursor-pointer"
+                      onClick={() => speak(l.char, l.name)}
+                    >
+                      <span className="text-5xl font-bold text-slate-800 drop-shadow-sm">{l.char}</span>
+                      <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">{l.name}</span>
+                      <Volume2 className="h-4 w-4 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="text-sm text-slate-500 mt-3 italic text-center">Remaining consonants</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      <footer className="mt-auto py-8">
+        <Link href="/">
+          <Button variant="link" className="text-slate-400 hover:text-sky-500 transition-colors gap-2">
+            <HomeIcon className="h-4 w-4" />
+            Back to Home
+          </Button>
+        </Link>
+      </footer>
+    </div>
+  );
+}
